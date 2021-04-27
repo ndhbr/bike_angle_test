@@ -1,0 +1,3 @@
+[submodule "bike_angle"]
+	path = bike_angle
+	url = https://github.com/ndhbr/bike_angle.git
