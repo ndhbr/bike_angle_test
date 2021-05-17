@@ -5,15 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "bike_angle_test",
+            "name": "Flutter",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "debug"
         },
         {
-            "name": "bike_angle",
-            "cwd": "bike_angle",
+            "name": "Flutter Release",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Flutter Profile Mode",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
         }
     ]
 }
