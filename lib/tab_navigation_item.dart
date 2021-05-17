@@ -1,4 +1,4 @@
-import 'package:bikeangletest/pages/logbook.dart';
+import 'package:bikeangletest/pages/logbook/logbook.dart';
 import 'package:bikeangletest/pages/recording.dart';
 import 'package:flutter/material.dart';
 
