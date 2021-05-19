@@ -1,6 +1,8 @@
 import 'package:bikeangletest/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,10 @@ class MyApp extends StatelessWidget {
 
     // Portrait only
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+    // Intl
+    Intl.defaultLocale = 'de_DE';
+    initializeDateFormatting();
 
     return MaterialApp(
       title: 'Bike Angle',

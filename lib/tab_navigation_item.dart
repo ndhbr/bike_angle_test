@@ -15,12 +15,12 @@ class TabNavigationItem {
 
   static List<TabNavigationItem> get items => [
         TabNavigationItem(
-          page: Recording(),
+          page: RecordingPage(),
           icon: Icon(Icons.compass_calibration_outlined),
           title: 'Aufzeichnen',
         ),
         TabNavigationItem(
-          page: Logbook(),
+          page: LogbookPage(),
           icon: Icon(Icons.bookmark_border_outlined),
           title: 'Fahrtenbuch',
         ),

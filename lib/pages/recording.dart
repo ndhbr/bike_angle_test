@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bikeangle/bikeangle.dart';
-import 'package:bikeangle/device_rotation.dart';
+import 'package:bikeangle/models/device_rotation.dart';
 import 'package:bikeangletest/clipper/half_clip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-class Recording extends StatefulWidget {
+class RecordingPage extends StatefulWidget {
   @override
-  _RecordingState createState() => _RecordingState();
+  _RecordingPageState createState() => _RecordingPageState();
 }
 
-class _RecordingState extends State<Recording> with TickerProviderStateMixin {
+class _RecordingPageState extends State<RecordingPage>
+    with TickerProviderStateMixin {
   /// Bike Angle Library
   BikeAngle _bikeAngle;
   StreamSubscription _rotationStream;
@@ -36,7 +36,6 @@ class _RecordingState extends State<Recording> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -50,9 +49,9 @@ class _RecordingState extends State<Recording> with TickerProviderStateMixin {
   }
 
   Future<void> _init() async {
-    _bikeAngle = BikeAngle();
+    _bikeAngle = BikeAngle(debug: true);
 
-    Stream<DeviceRotation> stream = await _bikeAngle.startAngleRecording();
+    Stream<DeviceRotation> stream = await _bikeAngle.getBikeAngle();
     _rotationStream = stream.listen((deviceRotation) {
       if (deviceRotation != null) {
         _deviceRotation = deviceRotation;
@@ -72,7 +71,7 @@ class _RecordingState extends State<Recording> with TickerProviderStateMixin {
   }
 
   Future<void> _reset() async {
-    await _bikeAngle.stopAngleRecording();
+    await _bikeAngle.stopBikeAngleStream();
 
     if (_rotationStream != null) {
       await _rotationStream.cancel();
@@ -210,11 +209,15 @@ class _RecordingState extends State<Recording> with TickerProviderStateMixin {
 
   Row _buildControls() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () => _bikeAngle.startRecording(),
           child: Text('Aufzeichnung starten'),
+        ),
+        ElevatedButton(
+          onPressed: () => _bikeAngle.stopRecording(),
+          child: Text('Stoppen'),
         ),
       ],
     );
