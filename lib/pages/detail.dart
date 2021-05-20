@@ -53,21 +53,17 @@ class _DetailPageState extends State<DetailPage> {
           child: Column(
             children: [
               _buildDateCard(),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Builder(
-                    builder: (BuildContext context) {
-                      if (_deviceRotations.isEmpty) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
+              const SizedBox(height: 8.0),
+              Builder(
+                builder: (BuildContext context) {
+                  if (_deviceRotations.isEmpty) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                      return _buildLineChart(gradientColorsBlue, _angleData());
-                    },
-                  ),
-                ),
+                  return _buildLineChart(gradientColorsBlue, _angleData());
+                },
               )
             ],
           ),
@@ -86,6 +82,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Card _buildDateCard() {
     return Card(
+      margin: EdgeInsets.zero,
       child: Column(
         children: [
           ListTile(
@@ -117,31 +114,28 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildLineChart(List<Color> colors, LineChartData data) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: AspectRatio(
-        aspectRatio: 1.8,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: colors),
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding:
-                const EdgeInsets.only(right: 40, left: 8.0, top: 22, bottom: 8),
-            child: LineChart(data),
-          ),
+    return AspectRatio(
+      aspectRatio: 1.8,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: colors),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding:
+              const EdgeInsets.only(right: 40, left: 8.0, top: 22, bottom: 8),
+          child: LineChart(data),
         ),
       ),
     );

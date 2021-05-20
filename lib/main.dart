@@ -113,16 +113,21 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue,
         primaryColorDark: Colors.blue[700],
         accentColor: Colors.blue,
-        backgroundColor: Colors.grey[800],
+        backgroundColor: Colors.black,
+        scaffoldBackgroundColor: Colors.black,
         appBarTheme: AppBarTheme(
-          color: Colors.grey[800],
+          color: Colors.black,
           brightness: Brightness.dark,
           elevation: 0.0,
         ),
-        dividerColor: Colors.grey[900],
-        iconTheme: IconThemeData(color: Colors.grey[600]),
+        dividerColor: Colors.grey,
+        iconTheme: IconThemeData(color: Colors.blue),
         fontFamily: 'Open Sans',
         brightness: Brightness.dark,
+        // Navigation bar
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.black,
+        ),
         // Tabs
         tabBarTheme: const TabBarTheme(
           indicator: BoxDecoration(
@@ -145,7 +150,7 @@ class MyApp extends StatelessWidget {
         // Card
         cardTheme: CardTheme(
           elevation: 2.0,
-          color: Colors.grey[800],
+          color: Colors.grey[900],
         ),
         // Input decoration
         inputDecorationTheme: InputDecorationTheme(

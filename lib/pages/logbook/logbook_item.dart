@@ -30,16 +30,14 @@ class _LogbookItemState extends State<LogbookItem> {
             .toString() +
         ' Uhr';
 
-    return Card(
-      child: ListTile(
-        leading: Icon(Icons.sports_motorsports_outlined, size: 32),
-        trailing: Icon(Icons.arrow_right),
-        title: Text(_recording.title),
-        subtitle: Text(subtitle),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DetailPage(_recording)),
-        ),
+    return ListTile(
+      leading: Icon(Icons.sports_motorsports_outlined, size: 32),
+      trailing: Icon(Icons.chevron_right_outlined),
+      title: Text(_recording.title),
+      subtitle: Text(subtitle),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DetailPage(_recording)),
       ),
     );
   }

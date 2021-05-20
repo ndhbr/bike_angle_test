@@ -15,7 +15,7 @@ class RecordingPage extends StatefulWidget {
 class _RecordingPageState extends State<RecordingPage>
     with TickerProviderStateMixin {
   /// Bike Angle Library
-  BikeAngle _bikeAngle;
+  final BikeAngle _bikeAngle = BikeAngle(debug: true);
   StreamSubscription _rotationStream;
   DeviceRotation _deviceRotation;
 
@@ -36,21 +36,24 @@ class _RecordingPageState extends State<RecordingPage>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildAngleVisualization(),
-          _buildControls(),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Aufzeichnen'),
+      ),
+      body: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildAngleVisualization(),
+            _buildControls(),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _init() async {
-    _bikeAngle = BikeAngle(debug: true);
-
     Stream<DeviceRotation> stream = await _bikeAngle.getBikeAngle();
     _rotationStream = stream.listen((deviceRotation) {
       if (deviceRotation != null) {
@@ -207,19 +210,19 @@ class _RecordingPageState extends State<RecordingPage>
     );
   }
 
-  Row _buildControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        ElevatedButton(
-          onPressed: () => _bikeAngle.startRecording(),
-          child: Text('Aufzeichnung starten'),
-        ),
-        ElevatedButton(
-          onPressed: () => _bikeAngle.stopRecording(),
-          child: Text('Stoppen'),
-        ),
-      ],
-    );
+  Widget _buildControls() {
+    if (_bikeAngle.isRecording()) {
+      return ElevatedButton.icon(
+        onPressed: () => _bikeAngle.stopRecording(),
+        icon: Icon(Icons.stop_outlined),
+        label: Text('Stoppen'.toUpperCase()),
+      );
+    } else {
+      return ElevatedButton.icon(
+        onPressed: () => _bikeAngle.startRecording(),
+        icon: Icon(Icons.play_arrow_outlined),
+        label: Text('Aufzeichnung starten'.toUpperCase()),
+      );
+    }
   }
 }
