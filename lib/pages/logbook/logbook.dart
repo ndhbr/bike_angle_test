@@ -11,7 +11,7 @@ class LogbookPage extends StatefulWidget {
 
 class _LogbookPageState extends State<LogbookPage> {
   /// Bike Angle Library
-  final BikeAngle _bikeAngle = BikeAngle();
+  final BikeAngle _bikeAngle = BikeAngle(debug: true);
 
   /// Listed recordings
   List<Recording> _recordings;
@@ -26,6 +26,7 @@ class _LogbookPageState extends State<LogbookPage> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async => await _getRecordings(),
+      displacement: 80.0,
       child: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
@@ -46,54 +47,6 @@ class _LogbookPageState extends State<LogbookPage> {
             ),
           ),
         ],
-      ),
-    );
-
-    return CustomScrollView(slivers: [
-      SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              margin: EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('Test'),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4.0,
-                      vertical: 8.0,
-                    ),
-                    itemBuilder: (context, index) {
-                      return LogbookItem(_recordings[index]);
-                    },
-                    itemCount: _recordings.length,
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    ]);
-
-    return RefreshIndicator(
-      onRefresh: () async => await _getRecordings(),
-      child: SingleChildScrollView(
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4.0,
-            vertical: 8.0,
-          ),
-          itemBuilder: (context, index) {
-            return LogbookItem(_recordings[index]);
-          },
-          itemCount: _recordings.length,
-        ),
       ),
     );
   }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
-import 'package:bikeangletest/clipper/half_clip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
@@ -25,6 +24,9 @@ class _RecordingPageState extends State<RecordingPage>
   @override
   void initState() {
     _init();
+    // _bikeAngle.listenToDeviceRotationEvents().listen((event) {
+    // print('New device rotation ${DateTime.fromMillisecondsSinceEpoch(event.capturedAt).toIso8601String()}');
+    // });
     super.initState();
   }
 
@@ -45,6 +47,7 @@ class _RecordingPageState extends State<RecordingPage>
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Text('${_deviceRotation?.bikeAngle6?.toStringAsFixed(0) ?? 0} °'),
             _buildAngleVisualization(),
             _buildControls(),
           ],
@@ -60,7 +63,9 @@ class _RecordingPageState extends State<RecordingPage>
         _deviceRotation = deviceRotation;
 
         if (mounted) {
-          _rotationController.animateTo(_deviceRotation.pitch.abs() / 90);
+          // if (!_rotationController.isAnimating)
+          // _rotationController.animateTo(_deviceRotation.pitch.abs() / 90);
+          _rotationController.value = (_deviceRotation.bikeAngle6.abs() / 90);
         }
 
         setState(() {});
@@ -74,6 +79,7 @@ class _RecordingPageState extends State<RecordingPage>
   }
 
   Future<void> _reset() async {
+    _rotationController.dispose();
     await _bikeAngle.stopBikeAngleStream();
 
     if (_rotationStream != null) {
@@ -83,7 +89,7 @@ class _RecordingPageState extends State<RecordingPage>
   }
 
   Widget _buildAngleVisualization() {
-    double pitch = _deviceRotation?.pitch ?? 0.0;
+    double pitch = _deviceRotation?.bikeAngle6 ?? 0.0;
 
     if (pitch > 80) {
       pitch = 80;
@@ -97,73 +103,8 @@ class _RecordingPageState extends State<RecordingPage>
         width: double.infinity,
         child: Stack(
           children: [
-            Positioned(
-              left: 48.0,
-              bottom: 0.0,
-              child: ClipRect(
-                clipper: HalfClip(),
-                child: SleekCircularSlider(
-                  appearance: CircularSliderAppearance(
-                    customWidths: CustomSliderWidths(
-                      progressBarWidth: 24,
-                      handlerSize: 6,
-                      trackWidth: 24,
-                    ),
-                    customColors: CustomSliderColors(
-                      shadowMaxOpacity: 0.0,
-                      trackGradientStartAngle: 260,
-                      trackGradientEndAngle: 340,
-                      trackColors: [
-                        Colors.green,
-                        Colors.yellow,
-                        Colors.red,
-                      ],
-                      progressBarColor: Colors.black26,
-                    ),
-                    angleRange: 80,
-                    startAngle: 260,
-                    counterClockwise: true,
-                  ),
-                  min: 0,
-                  max: 80,
-                  initialValue: (pitch < 0) ? pitch.abs() : 0,
-                  innerWidget: (_) => Container(),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 48.0,
-              bottom: 0.0,
-              child: ClipRect(
-                clipper: HalfClip(left: true),
-                child: SleekCircularSlider(
-                  appearance: CircularSliderAppearance(
-                    customWidths: CustomSliderWidths(
-                      progressBarWidth: 24,
-                      handlerSize: 6,
-                      trackWidth: 24,
-                    ),
-                    customColors: CustomSliderColors(
-                      shadowMaxOpacity: 0.0,
-                      trackGradientStartAngle: 280,
-                      trackGradientEndAngle: 370,
-                      trackColors: [
-                        Colors.green,
-                        Colors.yellow,
-                        Colors.red,
-                      ],
-                      progressBarColor: Colors.black26,
-                    ),
-                    angleRange: 80,
-                    startAngle: 280,
-                  ),
-                  min: 0,
-                  max: 80,
-                  initialValue: (pitch > 0) ? pitch : 0,
-                  innerWidget: (_) => Container(),
-                ),
-              ),
-            ),
+            _buildSlider(pitch),
+            _buildSlider(pitch, isRight: true),
             Center(
               child: SizedBox(
                 width: 128,
@@ -172,6 +113,66 @@ class _RecordingPageState extends State<RecordingPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSlider(double pitch, {bool isRight}) {
+    // Positioned
+    double left = 48.0;
+    double right;
+
+    // Slider
+    double angleRange = 90;
+    double trackGradientStartAngle = 260.0;
+    double trackGradientEndAngle = 350.0;
+    double startAngle = 260;
+    bool counterClockwise = true;
+    double initialValue = (pitch < 0) ? pitch.abs() : 0;
+
+    if (isRight != null && isRight) {
+      // Positioned
+      left = null;
+      right = 48.0;
+
+      // Slider
+      trackGradientStartAngle = 280.0;
+      trackGradientEndAngle = 370.0;
+      startAngle = 280;
+      counterClockwise = false;
+      initialValue = (pitch > 0) ? pitch : 0;
+    }
+
+    return Positioned(
+      left: left,
+      right: right,
+      bottom: 0.0,
+      child: SleekCircularSlider(
+        appearance: CircularSliderAppearance(
+          customWidths: CustomSliderWidths(
+            progressBarWidth: 24,
+            handlerSize: 6,
+            trackWidth: 24,
+          ),
+          customColors: CustomSliderColors(
+            shadowMaxOpacity: 0.0,
+            trackGradientStartAngle: trackGradientStartAngle,
+            trackGradientEndAngle: trackGradientEndAngle,
+            trackColors: [
+              Colors.green,
+              Colors.yellow,
+              Colors.red,
+            ],
+            progressBarColor: Colors.black26,
+          ),
+          angleRange: angleRange,
+          startAngle: startAngle,
+          counterClockwise: counterClockwise,
+        ),
+        min: 0,
+        max: 90,
+        initialValue: initialValue,
+        innerWidget: (_) => Container(),
       ),
     );
   }
@@ -203,7 +204,7 @@ class _RecordingPageState extends State<RecordingPage>
         ),
         const SizedBox(height: 16.0),
         Text(
-          'Rotation ${_deviceRotation.pitch.abs().toStringAsFixed(0)} °',
+          'Rotation ${_deviceRotation.bikeAngle6.abs().toStringAsFixed(0)} °',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
