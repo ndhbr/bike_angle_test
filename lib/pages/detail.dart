@@ -54,17 +54,17 @@ class _DetailPageState extends State<DetailPage> {
             children: [
               _buildDateCard(),
               const SizedBox(height: 8.0),
-              Builder(
-                builder: (BuildContext context) {
-                  if (_deviceRotations.isEmpty) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+              // Builder(
+              //   builder: (BuildContext context) {
+              //     if (_deviceRotations.isEmpty) {
+              //       return Center(
+              //         child: CircularProgressIndicator(),
+              //       );
+              //     }
 
-                  return _buildLineChart(gradientColorsBlue, _angleData());
-                },
-              )
+              //     return _buildLineChart(gradientColorsBlue, _angleData());
+              //   },
+              // ),
             ],
           ),
         ),
@@ -147,7 +147,7 @@ class _DetailPageState extends State<DetailPage> {
     // Spot
     List<FlSpot> spots = [];
     List<double> smoothedValues = Utils.smoothList(
-      _deviceRotations.map((e) => e.pitch).toList(),
+      _deviceRotations.map((e) => e.x).toList(),
       sectorSize,
     );
     smoothedValues.asMap().forEach((key, value) {
