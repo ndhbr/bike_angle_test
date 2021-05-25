@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
@@ -18,7 +19,7 @@ class _RecordingPageState extends State<RecordingPage>
   DeviceRotation _deviceRotation;
 
   /// Rotation controller
-  // AnimationController _rotationController;
+  AnimationController _rotationController;
 
   // Artboard _riveArtboard;
   // RiveAnimationController _controller;
@@ -43,6 +44,12 @@ class _RecordingPageState extends State<RecordingPage>
     //   },
     // );
 
+    // Rotation controller
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 100),
+    );
+
     super.initState();
   }
 
@@ -57,41 +64,34 @@ class _RecordingPageState extends State<RecordingPage>
     return Scaffold(
         appBar: AppBar(
           title: Text('Aufzeichnen'),
-          actions: [
-            // IconButton(
-            //   onPressed: () {
-            //     LinearAnimationInstance a =
-            //         _riveArtboard.animationByName('Links');
-            //     a.animation.duration = 30;
-
-            //     if (_leftController == null) {
-            //       _leftController = SimpleAnimation('Links');
-            //       _riveArtboard.addController(_leftController);
-            //     }
-
-            //     setState(() => _leftController.isActive = true);
-            //   },
-            //   icon: Icon(Icons.access_alarm),
-            // ),
-          ],
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Transform.rotate(
-              angle: _deviceRotation?.bikeAngleRad ?? 0.0,
-              child: Text(
-                '${((_deviceRotation?.bikeAngle ?? 0.0) + 90).toStringAsFixed(0)} °',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 36,
+        body: Container(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedBuilder(
+                  animation: _rotationController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _deviceRotation?.bikeAngleRad ?? 0.0,
+                      child: Text(
+                        '${((_deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 36,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
                 ),
-                textAlign: TextAlign.center,
-              ),
+                // _buildAngleVisualization(),
+                _buildControls(),
+              ],
             ),
-            _buildAngleVisualization(),
-            _buildControls(),
-          ],
+          ),
         ));
   }
 
@@ -100,12 +100,6 @@ class _RecordingPageState extends State<RecordingPage>
     _rotationStream = stream.listen((deviceRotation) {
       if (deviceRotation != null) {
         _deviceRotation = deviceRotation;
-
-        if (mounted) {
-          // if (!_rotationController.isAnimating)
-          // _rotationController.animateTo(_deviceRotation.pitch.abs() / 90);
-          // _rotationController.value = (_deviceRotation.bikeAngle6.abs() / 90);
-        }
 
         if (mounted) {
           setState(() {});
