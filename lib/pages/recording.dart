@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
 import 'package:flutter/material.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:rive/rive.dart';
 
 class RecordingPage extends StatefulWidget {
   @override
@@ -16,38 +17,39 @@ class _RecordingPageState extends State<RecordingPage>
   /// Bike Angle Library
   final BikeAngle _bikeAngle = BikeAngle(debug: true);
   StreamSubscription _rotationStream;
-  DeviceRotation _deviceRotation;
 
   /// Rotation controller
   AnimationController _rotationController;
 
-  // Artboard _riveArtboard;
-  // RiveAnimationController _controller;
-  // RiveAnimationController _leftController;
+  /// Rive
+  Artboard _riveArtboard;
+  SMIInput<double> _riveAngle;
 
   @override
   void initState() {
-    _init();
-    // Load the animation file from the bundle, note that you could also
-    // download this. The RiveFile just expects a list of bytes.
-    // rootBundle.load('assets/bike.riv').then(
-    //   (data) async {
-    //     // Load the RiveFile from the binary data.
-    //     final file = RiveFile.import(data);
-    //     // The artboard is the root of the animation and gets drawn in the
-    //     // Rive widget.
-    //     final artboard = file.mainArtboard;
-    //     // Add a controller to play back a known animation on the main/default
-    //     // artboard.We store a reference to it so we can toggle playback.
-    //     artboard.addController(_controller = SimpleAnimation('Idle'));
-    //     setState(() => _riveArtboard = artboard);
-    //   },
-    // );
-
     // Rotation controller
     _rotationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 100),
+    );
+
+    // Load the animation file from the bundle, note that you could also
+    // download this. The RiveFile just expects a list of bytes.
+    rootBundle.load('assets/bike.riv').then(
+      (data) async {
+        // Load the RiveFile from the binary data.
+        final file = RiveFile.import(data);
+
+        // The artboard is the root of the animation and gets drawn in the
+        // Rive widget.
+        final artboard = file.mainArtboard;
+        var controller = StateMachineController.fromArtboard(artboard, 'State');
+        if (controller != null) {
+          artboard.addController(controller);
+          _riveAngle = controller.findInput('Angle');
+        }
+        setState(() => _riveArtboard = artboard);
+      },
     );
 
     super.initState();
@@ -55,7 +57,6 @@ class _RecordingPageState extends State<RecordingPage>
 
   @override
   void dispose() {
-    _reset();
     super.dispose();
   }
 
@@ -64,6 +65,12 @@ class _RecordingPageState extends State<RecordingPage>
     return Scaffold(
         appBar: AppBar(
           title: Text('Aufzeichnen'),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.info_outline),
+            ),
+          ],
         ),
         body: Container(
           child: Center(
@@ -71,23 +78,112 @@ class _RecordingPageState extends State<RecordingPage>
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                AnimatedBuilder(
-                  animation: _rotationController,
-                  builder: (context, child) {
-                    return Transform.rotate(
-                      angle: _deviceRotation?.bikeAngleRad ?? 0.0,
-                      child: Text(
-                        '${((_deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 36,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                FutureBuilder(
+                  future: _bikeAngle.getBikeAngle(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.warning_outlined),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            'Gyroscope nicht verfügbar!',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    if (!snapshot.hasData) {
+                      return _buildLoadingSpinner();
+                    }
+
+                    return StreamBuilder<DeviceRotation>(
+                      stream: snapshot.data,
+                      initialData: DeviceRotation(0),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildLoadingSpinner();
+                        }
+
+                        DeviceRotation deviceRotation = snapshot.data;
+
+                        // rive angle
+                        if (_riveAngle != null) {
+                          print(
+                              'Angle: ${deviceRotation.bikeAngle.roundToDouble()}');
+                          _riveAngle.value =
+                              deviceRotation.bikeAngle.roundToDouble();
+                        }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // AnimatedBuilder(
+                            //   animation: _rotationController,
+                            //   builder: (context, child) {
+                            //     return Transform.rotate(
+                            //       angle: -deviceRotation?.bikeAngleRad ?? 0.0,
+                            //       alignment: Alignment.bottomCenter,
+                            //       child: Column(
+                            //         mainAxisSize: MainAxisSize.min,
+                            //         children: [
+                            //           Text(
+                            //             '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                            //             style: TextStyle(
+                            //               fontWeight: FontWeight.bold,
+                            //               fontSize: 36,
+                            //             ),
+                            //             textAlign: TextAlign.center,
+                            //           ),
+                            //           SvgPicture.asset(
+                            //             'assets/motorcycle.svg',
+                            //             width: 128,
+                            //           )
+                            //         ],
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
+                            // SizedBox(height: 16.0),
+                            if (_riveArtboard != null) ...{
+                              SizedBox(
+                                height: 128,
+                                child: Rive(
+                                  artboard: _riveArtboard,
+                                ),
+                              ),
+                            },
+                            SizedBox(height: 16.0),
+                            if (deviceRotation.valid) ...{
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_outlined),
+                                  const SizedBox(width: 8.0),
+                                  Text('Ausrichtung korrekt'),
+                                ],
+                              ),
+                            } else ...{
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.error_outline, color: Colors.red),
+                                  const SizedBox(width: 8.0),
+                                  Text('Ausrichtung inkorrekt'),
+                                ],
+                              ),
+                            }
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
-                // _buildAngleVisualization(),
                 _buildControls(),
               ],
             ),
@@ -95,123 +191,49 @@ class _RecordingPageState extends State<RecordingPage>
         ));
   }
 
-  Future<void> _init() async {
-    Stream<DeviceRotation> stream = await _bikeAngle.getBikeAngle();
-    _rotationStream = stream.listen((deviceRotation) {
-      if (deviceRotation != null) {
-        _deviceRotation = deviceRotation;
-
-        if (mounted) {
-          setState(() {});
-        }
-      }
-    });
-
-    // _rotationController = AnimationController(
-    //   duration: const Duration(milliseconds: 100),
-    //   vsync: this,
-    // );
-  }
-
-  Future<void> _reset() async {
-    // _rotationController.dispose();
-    await _bikeAngle.stopBikeAngleStream();
-
-    if (_rotationStream != null) {
-      await _rotationStream.cancel();
-      _rotationStream = null;
-    }
-  }
-
-  Widget _buildAngleVisualization() {
-    double pitch = _deviceRotation?.bikeAngle ?? 0.0;
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 164,
-        child: Stack(
-          children: [
-            _buildSlider(-pitch),
-            _buildSlider(-pitch, isRight: true),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSlider(double pitch, {bool isRight}) {
-    // Positioned
-    double left = 48.0;
-    double right;
-
-    // Slider
-    double angleRange = 90;
-    double trackGradientStartAngle = 260.0;
-    double trackGradientEndAngle = 350.0;
-    double startAngle = 260;
-    bool counterClockwise = true;
-    double initialValue = (pitch < 0) ? pitch.abs() : 0;
-
-    if (isRight != null && isRight) {
-      // Positioned
-      left = null;
-      right = 48.0;
-
-      // Slider
-      trackGradientStartAngle = 280.0;
-      trackGradientEndAngle = 370.0;
-      startAngle = 280;
-      counterClockwise = false;
-      initialValue = (pitch > 0) ? pitch : 0;
-    }
-
-    return Positioned(
-      left: left,
-      right: right,
-      bottom: 0.0,
-      child: SleekCircularSlider(
-        appearance: CircularSliderAppearance(
-          customWidths: CustomSliderWidths(
-            progressBarWidth: 24,
-            handlerSize: 6,
-            trackWidth: 24,
-          ),
-          customColors: CustomSliderColors(
-            shadowMaxOpacity: 0.0,
-            trackGradientStartAngle: trackGradientStartAngle,
-            trackGradientEndAngle: trackGradientEndAngle,
-            trackColors: [
-              Colors.green,
-              Colors.yellow,
-              Colors.red,
-            ],
-            progressBarColor: Colors.black26,
-          ),
-          angleRange: angleRange,
-          startAngle: startAngle,
-          counterClockwise: counterClockwise,
-        ),
-        min: 0,
-        max: 90,
-        initialValue: initialValue,
-        innerWidget: (_) => Container(),
-      ),
+  Widget _buildLoadingSpinner() {
+    return SizedBox(
+      height: 64,
+      width: 64,
+      child: CircularProgressIndicator(),
     );
   }
 
   Widget _buildControls() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      transitionBuilder: (child, animation) => ScaleTransition(
+        child: child,
+        scale: animation,
+      ),
+      child: _getControls(),
+    );
+  }
+
+  Widget _getControls() {
     if (_bikeAngle.isRecording()) {
       return ElevatedButton.icon(
-        onPressed: () => _bikeAngle.stopRecording(),
+        onPressed: () async {
+          await _bikeAngle.stopRecording();
+          setState(() {});
+        },
         icon: Icon(Icons.stop_outlined),
-        label: Text('Stoppen'.toUpperCase()),
+        label: Text(
+          'Stoppen'.toUpperCase(),
+        ),
+        key: ValueKey(1),
       );
     } else {
       return ElevatedButton.icon(
-        onPressed: () => _bikeAngle.startRecording(),
+        onPressed: () async {
+          await _bikeAngle.startRecording();
+          setState(() {});
+        },
         icon: Icon(Icons.play_arrow_outlined),
-        label: Text('Aufzeichnung starten'.toUpperCase()),
+        label: Text(
+          'Aufzeichnung starten'.toUpperCase(),
+        ),
+        key: ValueKey(2),
       );
     }
   }

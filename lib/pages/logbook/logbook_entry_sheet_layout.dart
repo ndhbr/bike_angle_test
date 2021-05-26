@@ -14,7 +14,7 @@ class LogbookEntrySheetLayout extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.delete),
+              leading: const Icon(Icons.delete_outline),
               title: Text('Aufzeichnung löschen'),
               onTap: () async {
                 await _showDialog(context);

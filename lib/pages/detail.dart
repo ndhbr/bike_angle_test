@@ -1,15 +1,19 @@
+import 'dart:math';
+
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
 import 'package:bikeangletest/shared/utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:bikeangle/models/recording.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class DetailPage extends StatefulWidget {
   final Recording recording;
 
-  DetailPage(this.recording);
+  DetailPage(this.recording, {Key key}) : super(key: key);
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -20,7 +24,7 @@ class _DetailPageState extends State<DetailPage> {
   final BikeAngle _bikeAngle = BikeAngle();
 
   /// Smoothness value of the graphs
-  final int sectorSize = 30;
+  final int sectorSize = 150;
 
   /// Recording
   Recording _recording;
@@ -35,6 +39,10 @@ class _DetailPageState extends State<DetailPage> {
   List<Color> gradientColorsBlue = [Colors.blue, Colors.blue[700]];
   List<Color> gradientColorsBlueChart = [Colors.blue[600], Colors.blue[800]];
 
+  /// Edit mode
+  bool _editMode;
+  TextEditingController _titleInputController;
+
   @override
   void initState() {
     _init();
@@ -45,7 +53,25 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_recording.title),
+        title: (!_editMode)
+            ? Text(_recording.title)
+            : TextFormField(
+                controller: _titleInputController,
+                style: TextStyle(height: 1.0),
+              ),
+        actions: [
+          if (!_editMode) ...{
+            IconButton(
+              onPressed: () => _toggleEditMode(),
+              icon: Icon(Icons.edit_outlined),
+            ),
+          } else ...{
+            IconButton(
+              onPressed: () => _saveNewName(),
+              icon: Icon(Icons.save_outlined),
+            ),
+          }
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -54,17 +80,9 @@ class _DetailPageState extends State<DetailPage> {
             children: [
               _buildDateCard(),
               const SizedBox(height: 8.0),
-              // Builder(
-              //   builder: (BuildContext context) {
-              //     if (_deviceRotations.isEmpty) {
-              //       return Center(
-              //         child: CircularProgressIndicator(),
-              //       );
-              //     }
-
-              //     return _buildLineChart(gradientColorsBlue, _angleData());
-              //   },
-              // ),
+              _buildDiagram(),
+              const SizedBox(height: 8.0),
+              _buildStatsCard(),
             ],
           ),
         ),
@@ -73,11 +91,45 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _init() async {
+    _editMode = false;
+    _titleInputController = TextEditingController(text: widget.recording.title);
+
     _recording = widget.recording;
     _deviceRotations = [];
     _deviceRotations = await _bikeAngle.getRecordedAngles(_recording.id);
 
     setState(() {});
+  }
+
+  void _toggleEditMode() {
+    setState(() => _editMode = !_editMode);
+  }
+
+  Future<void> _saveNewName() async {
+    if (_titleInputController != null) {
+      String newTitle = _titleInputController.text;
+
+      if (newTitle != _recording.title) {
+        await _bikeAngle.setRecordingTitle(_recording.id, newTitle);
+        _recording.title = newTitle;
+      }
+    }
+
+    _toggleEditMode();
+  }
+
+  Builder _buildDiagram() {
+    return Builder(
+      builder: (BuildContext context) {
+        if (_deviceRotations.isEmpty) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return _buildLineChart(gradientColorsBlue, _angleData());
+      },
+    );
   }
 
   Card _buildDateCard() {
@@ -86,11 +138,17 @@ class _DetailPageState extends State<DetailPage> {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(Icons.watch_later_outlined),
+            leading: SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.watch_later_outlined),
+            ),
             title: Text(
               DateFormat("EEEE, dd.MM.yyy HH:mm", 'de_DE')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          _recording.startedRecordingTimestamp))
+                      .format(
+                        DateTime.fromMillisecondsSinceEpoch(
+                          _recording.startedRecordingTimestamp,
+                        ),
+                      )
                       .toString() +
                   ' Uhr',
             ),
@@ -98,17 +156,159 @@ class _DetailPageState extends State<DetailPage> {
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.watch_later_outlined),
+            leading: SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.watch_later_outlined),
+            ),
             title: Text(
               DateFormat("EEEE, dd.MM.yyy HH:mm", 'de_DE')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          _recording.startedRecordingTimestamp))
+                      .format(
+                        DateTime.fromMillisecondsSinceEpoch(
+                          _recording.stoppedRecordingTimestamp,
+                        ),
+                      )
                       .toString() +
                   ' Uhr',
             ),
             subtitle: Text('Endzeitpunkt'),
           ),
         ],
+      ),
+    );
+  }
+
+  Card _buildStatsCard() {
+    double maxLeft = Utils.getGreatestNumber(
+        _deviceRotations.map((e) => e.bikeAngle).toList());
+    double maxRight = Utils.getLowestNumber(
+        _deviceRotations.map((e) => e.bikeAngle).toList());
+    double maxAngle = maxLeft;
+
+    if (maxRight.abs() > maxLeft.abs()) {
+      maxAngle = maxRight;
+    }
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Column(
+        children: [
+          ListTile(
+            leading: SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.architecture_outlined),
+            ),
+            title: Text(maxAngle.abs().toStringAsFixed(1) + '°'),
+            subtitle: Text('Maximalwinkel'),
+          ),
+          Divider(),
+          ListTile(
+            leading: SizedBox(
+              height: double.infinity,
+              child: Icon(Icons.screen_rotation_outlined),
+            ),
+            title: Text(maxLeft.abs().toStringAsFixed(1) + '°'),
+            subtitle: Text('Maximale Neigung: Linkskurve'),
+          ),
+          ListTile(
+            leading: SizedBox(
+              height: double.infinity,
+              child: Transform(
+                transform: Matrix4.rotationY(pi),
+                alignment: Alignment.center,
+                child: Icon(Icons.screen_rotation_outlined),
+              ),
+            ),
+            title: Text(maxRight.abs().toStringAsFixed(1) + '°'),
+            subtitle: Text('Maximale Neigung: Rechtskurve'),
+          ),
+          const SizedBox(height: 32.0),
+          _buildAngleVisualization(
+            maxAngleLeft: -maxLeft,
+            maxAngleRight: -maxRight,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAngleVisualization(
+      {@required double maxAngleLeft, @required double maxAngleRight}) {
+    return Container(
+      height: 150,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          _buildSlider(maxAngleLeft),
+          Center(child: SvgPicture.asset('assets/motorcycle.svg', width: 128)),
+          _buildSlider(maxAngleRight, isRight: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlider(double angle, {bool isRight}) {
+    // Positioned
+    double left = 48.0;
+    double right;
+
+    // Slider
+    double angleRange = 90;
+    double trackGradientStartAngle = 260.0;
+    double trackGradientEndAngle = 350.0;
+    double startAngle = 260;
+    bool counterClockwise = true;
+    double initialValue = (angle < 0) ? angle.abs() : 0;
+
+    if (isRight != null && isRight) {
+      // Positioned
+      left = null;
+      right = 48.0;
+
+      // Slider
+      trackGradientStartAngle = 280.0;
+      trackGradientEndAngle = 370.0;
+      startAngle = 280;
+      counterClockwise = false;
+      initialValue = (angle > 0) ? angle : 0;
+    }
+
+    return Positioned(
+      left: left,
+      right: right,
+      bottom: 0.0,
+      child: SleekCircularSlider(
+        appearance: CircularSliderAppearance(
+          customWidths: CustomSliderWidths(
+            progressBarWidth: 24,
+            handlerSize: 6,
+            trackWidth: 24,
+          ),
+          customColors: CustomSliderColors(
+            shadowMaxOpacity: 0.0,
+            trackGradientStartAngle: trackGradientStartAngle,
+            trackGradientEndAngle: trackGradientEndAngle,
+            trackColors: [
+              Colors.green,
+              Colors.yellow,
+              Colors.red,
+            ],
+            progressBarColor: Colors.black26,
+          ),
+          angleRange: angleRange,
+          startAngle: startAngle,
+          counterClockwise: counterClockwise,
+        ),
+        min: 0,
+        max: 90,
+        initialValue: initialValue,
+        innerWidget: (_) => Center(
+          child: Text(
+            '${angle.abs().toStringAsFixed(1)}°',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -122,7 +322,7 @@ class _DetailPageState extends State<DetailPage> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: colors),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -147,7 +347,7 @@ class _DetailPageState extends State<DetailPage> {
     // Spot
     List<FlSpot> spots = [];
     List<double> smoothedValues = Utils.smoothList(
-      _deviceRotations.map((e) => e.x).toList(),
+      _deviceRotations.map((e) => e.bikeAngle).toList(),
       sectorSize,
     );
     smoothedValues.asMap().forEach((key, value) {
@@ -248,7 +448,7 @@ class _DetailPageState extends State<DetailPage> {
                   _deviceRotations.last.capturedAt);
             }
 
-            return valueTime?.difference(startTime)?.inMinutes.toString() +
+            return startTime?.difference(valueTime)?.inMinutes.toString() +
                 ' min';
           },
           margin: 8,

@@ -40,7 +40,11 @@ class _LogbookPageState extends State<LogbookPage> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return LogbookItem(_recordings[index]);
+                return LogbookItem(
+                  _recordings[index],
+                  onDelete: _onDelete,
+                  key: ValueKey(_recordings[index].id),
+                );
               },
               // Or, uncomment the following line:
               childCount: _recordings.length,
@@ -63,5 +67,16 @@ class _LogbookPageState extends State<LogbookPage> {
     }
 
     setState(() {});
+  }
+
+  Future<void> _onDelete(int recordingId) async {
+    print('im here');
+    await _bikeAngle.removeRecording(recordingId);
+    _recordings.removeWhere((recording) => recording.id == recordingId);
+
+    if (mounted) {
+      setState(() {});
+      Navigator.of(context).pop();
+    }
   }
 }
