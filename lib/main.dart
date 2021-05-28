@@ -34,13 +34,14 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.grey[200],
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(
-            color: Colors.white,
-            brightness: Brightness.light,
-            elevation: 0.0,
-            textTheme:
-                Theme.of(context).textTheme.apply(bodyColor: Colors.black87),
-            iconTheme:
-                Theme.of(context).iconTheme.copyWith(color: Colors.black87)),
+          color: Colors.white,
+          brightness: Brightness.light,
+          elevation: 0.0,
+          textTheme:
+              Theme.of(context).textTheme.apply(bodyColor: Colors.black87),
+          iconTheme:
+              Theme.of(context).iconTheme.copyWith(color: Colors.black87),
+        ),
         dividerColor: Colors.grey[300],
         iconTheme: IconThemeData(color: Colors.grey[400]),
         fontFamily: 'Open Sans',

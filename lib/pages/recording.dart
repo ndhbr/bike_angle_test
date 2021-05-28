@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
+import 'package:bikeangletest/pages/info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:rive/rive.dart';
 
 class RecordingPage extends StatefulWidget {
@@ -67,7 +67,10 @@ class _RecordingPageState extends State<RecordingPage>
           title: Text('Aufzeichnen'),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoPage()),
+              ),
               icon: Icon(Icons.info_outline),
             ),
           ],
@@ -114,8 +117,6 @@ class _RecordingPageState extends State<RecordingPage>
 
                         // rive angle
                         if (_riveAngle != null) {
-                          print(
-                              'Angle: ${deviceRotation.bikeAngle.roundToDouble()}');
                           _riveAngle.value =
                               deviceRotation.bikeAngle.roundToDouble();
                         }

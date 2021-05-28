@@ -1,4 +1,5 @@
 import 'package:bikeangle/bikeangle.dart';
+import 'package:bikeangle/services/database/controller.dart';
 import 'package:bikeangletest/pages/logbook/logbook_item.dart';
 import 'package:bikeangle/models/recording.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,15 @@ class _LogbookPageState extends State<LogbookPage> {
   /// Bike Angle Library
   final BikeAngle _bikeAngle = BikeAngle(debug: true);
 
+  /// Scroll controller
+  final ScrollController _scrollController = ScrollController();
+
   /// Listed recordings
   List<Recording> _recordings;
+
+  /// Scroll state
+  bool _isLoading;
+  bool _isEnd;
 
   @override
   void initState() {
@@ -28,6 +36,8 @@ class _LogbookPageState extends State<LogbookPage> {
       onRefresh: () async => await _getRecordings(),
       displacement: 80.0,
       child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
             title: Text('Fahrtenbuch'),
@@ -57,20 +67,47 @@ class _LogbookPageState extends State<LogbookPage> {
 
   Future<void> _init() async {
     _recordings = [];
+    _isLoading = false;
+    _isEnd = false;
+
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels >=
+              0.75 * _scrollController.position.maxScrollExtent &&
+          _recordings.length > 0 &&
+          !_isLoading &&
+          !_isEnd) {
+        await _getRecordings(
+            startAfter: _recordings.last.startedRecordingTimestamp);
+      }
+    });
 
     await _getRecordings();
   }
 
-  Future<void> _getRecordings() async {
+  Future<void> _getRecordings({int startAfter}) async {
+    setState(() => _isLoading = true);
+
     if (_bikeAngle.initialized) {
-      _recordings = await _bikeAngle.getRecordings();
+      List<Recording> recordings =
+          await _bikeAngle.getRecordings(startAfter: startAfter);
+
+      if (recordings.length < PAGINATION_LIMIT) {
+        _isEnd = true;
+      } else {
+        _isEnd = false;
+      }
+
+      if (startAfter != null) {
+        _recordings.addAll(recordings);
+      } else {
+        _recordings = recordings;
+      }
     }
 
-    setState(() {});
+    setState(() => _isLoading = false);
   }
 
   Future<void> _onDelete(int recordingId) async {
-    print('im here');
     await _bikeAngle.removeRecording(recordingId);
     _recordings.removeWhere((recording) => recording.id == recordingId);
 
