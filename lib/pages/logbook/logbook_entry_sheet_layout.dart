@@ -13,16 +13,21 @@ class LogbookEntrySheetLayout extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: Text('Aufzeichnung löschen'),
-              onTap: () async {
-                await _showDialog(context);
-              },
-            ),
+            _buildRemoveRecordingTile(context),
           ],
         ),
       ),
+    );
+  }
+
+  /// Build remove recording tile
+  ListTile _buildRemoveRecordingTile(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.delete_outline),
+      title: Text('Aufzeichnung löschen'),
+      onTap: () async {
+        await _showDialog(context);
+      },
     );
   }
 

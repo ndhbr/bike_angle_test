@@ -1,4 +1,5 @@
 import 'package:bikeangletest/pages/home.dart';
+import 'package:bikeangletest/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -12,14 +13,10 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final RoundedRectangleBorder roundShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(32.0),
-    );
-
-    // Portrait only
+    // Portrait only (Lock)
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-    // Intl
+    // Intl (Localization)
     Intl.defaultLocale = 'de_DE';
     initializeDateFormatting();
 
@@ -74,12 +71,13 @@ class MyApp extends StatelessWidget {
         ),
         // Input decoration
         inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.white,
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            ),
-            errorStyle: TextStyle(color: Colors.red[400])),
+          filled: true,
+          fillColor: Colors.white,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          ),
+          errorStyle: TextStyle(color: Colors.red[400]),
+        ),
         // Buttons
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
@@ -155,12 +153,13 @@ class MyApp extends StatelessWidget {
         ),
         // Input decoration
         inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: Colors.grey[900],
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            ),
-            errorStyle: TextStyle(color: Colors.red[400])),
+          filled: true,
+          fillColor: Colors.grey[900],
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          ),
+          errorStyle: TextStyle(color: Colors.red[400]),
+        ),
         // Buttons
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(

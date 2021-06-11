@@ -90,6 +90,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Initialize detail page
   Future<void> _init() async {
     _editMode = false;
     _titleInputController = TextEditingController(text: widget.recording.title);
@@ -101,10 +102,12 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {});
   }
 
+  /// Toggle name edit mode
   void _toggleEditMode() {
     setState(() => _editMode = !_editMode);
   }
 
+  /// Save new name to the database and toggle edit mode
   Future<void> _saveNewName() async {
     if (_titleInputController != null) {
       String newTitle = _titleInputController.text;
@@ -118,20 +121,7 @@ class _DetailPageState extends State<DetailPage> {
     _toggleEditMode();
   }
 
-  Builder _buildDiagram() {
-    return Builder(
-      builder: (BuildContext context) {
-        if (_deviceRotations.isEmpty) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        return _buildLineChart(gradientColorsBlue, _angleData());
-      },
-    );
-  }
-
+  /// Build dates card
   Card _buildDateCard() {
     return Card(
       margin: EdgeInsets.zero,
@@ -177,6 +167,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Build stats card (max (left/right) angle)
   Card _buildStatsCard() {
     double maxLeft = Utils.getGreatestNumber(
         _deviceRotations.map((e) => e.bikeAngle).toList());
@@ -231,6 +222,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Build slider box to visualize the max bike angles
   Widget _buildAngleVisualization(
       {@required double maxAngleLeft, @required double maxAngleRight}) {
     return Container(
@@ -246,6 +238,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Build single slider for slider box
   Widget _buildSlider(double angle, {bool isRight}) {
     // Positioned
     double left = 48.0;
@@ -313,6 +306,23 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Build line chart by loaded device rotations
+  /// (or loading spinner, if data is not ready yet)
+  Builder _buildDiagram() {
+    return Builder(
+      builder: (BuildContext context) {
+        if (_deviceRotations.isEmpty) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return _buildLineChart(gradientColorsBlue, _angleData());
+      },
+    );
+  }
+
+  /// Build line chart by colors and data
   Widget _buildLineChart(List<Color> colors, LineChartData data) {
     return AspectRatio(
       aspectRatio: 1.8,
@@ -341,6 +351,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  /// Build line chart data
   LineChartData _angleData() {
     String title = 'Winkel';
 

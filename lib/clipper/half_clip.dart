@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Clip widget in half
 class HalfClip extends CustomClipper<Rect> {
   final bool isRight;
 

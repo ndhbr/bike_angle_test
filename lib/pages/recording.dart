@@ -192,6 +192,7 @@ class _RecordingPageState extends State<RecordingPage>
         ));
   }
 
+  /// Build loading spinner
   Widget _buildLoadingSpinner() {
     return SizedBox(
       height: 64,
@@ -200,6 +201,7 @@ class _RecordingPageState extends State<RecordingPage>
     );
   }
 
+  /// Build animated start/stop recording button
   Widget _buildControls() {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
@@ -211,6 +213,7 @@ class _RecordingPageState extends State<RecordingPage>
     );
   }
 
+  /// Get start/stop recording button
   Widget _getControls() {
     if (_bikeAngle.isRecording()) {
       return ElevatedButton.icon(

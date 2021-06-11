@@ -20,56 +20,79 @@ class _InfoPageState extends State<InfoPage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Text(
-                'Bike Angle',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 26,
-                ),
-              ),
-              FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<PackageInfo> snapshot) {
-                  if (snapshot.hasData) {
-                    PackageInfo packageInfo = snapshot.data;
-
-                    return Text(
-                        'Version ${packageInfo.version}+${packageInfo.buildNumber}');
-                  }
-
-                  return const Text('');
-                },
-              ),
+              _buildTitle(),
+              _buildVersionNumber(),
               const Divider(height: 64.0),
-              Text(
-                'Tipps zur Kalibrierung',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              if (Platform.isAndroid) ...{
-                _buildHintListTile(1, 'Öffne Google Maps',
-                    'Warte bis sich die Kartenansicht aufgebaut hat'),
-                _buildHintListTile(2, 'Tippe auf den blauen Punkt',
-                    'Daraufhin öffnet sich ein Fenster mit Optionen'),
-                _buildHintListTile(3, 'Tippe aus „Kompass kalibrieren“',
-                    'Der Knopf befindet sich unten links'),
-                _buildHintListTile(
-                    4, 'Tippe auf „Fertig“', 'Wenn die Genauigkeit hoch ist'),
-              } else ...{
-                _buildHintListTile(1, 'Starte das iPhone neu',
-                    'Warte bis es komplett hochgefahren ist'),
-                _buildHintListTile(2, 'Öffne den Kompass',
-                    'Dieser befindet sich standardmäßig im Ordner „Extras“'),
-                _buildHintListTile(3, 'Befolge die Anweisungen',
-                    'Und drehe dein Smartphone, bis der Prozess abgeschlossen ist'),
-              },
+              _buildCalibrationHints(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Build calibration hints
+  Column _buildCalibrationHints() {
+    return Column(
+      children: [
+        _buildCalibrationTitle(),
+        const SizedBox(height: 16.0),
+        if (Platform.isAndroid) ...{
+          _buildHintListTile(1, 'Öffne Google Maps',
+              'Warte bis sich die Kartenansicht aufgebaut hat'),
+          _buildHintListTile(2, 'Tippe auf den blauen Punkt',
+              'Daraufhin öffnet sich ein Fenster mit Optionen'),
+          _buildHintListTile(3, 'Tippe aus „Kompass kalibrieren“',
+              'Der Knopf befindet sich unten links'),
+          _buildHintListTile(
+              4, 'Tippe auf „Fertig“', 'Wenn die Genauigkeit hoch ist'),
+        } else ...{
+          _buildHintListTile(1, 'Starte das iPhone neu',
+              'Warte bis es komplett hochgefahren ist'),
+          _buildHintListTile(2, 'Öffne den Kompass',
+              'Dieser befindet sich standardmäßig im Ordner „Extras“'),
+          _buildHintListTile(3, 'Befolge die Anweisungen',
+              'Und drehe dein Smartphone, bis der Prozess abgeschlossen ist'),
+        },
+      ],
+    );
+  }
+
+  /// Build calibration title
+  Text _buildCalibrationTitle() {
+    return Text(
+      'Tipps zur Kalibrierung',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+    );
+  }
+
+  /// Build version label (package info)
+  FutureBuilder<PackageInfo> _buildVersionNumber() {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+        if (snapshot.hasData) {
+          PackageInfo packageInfo = snapshot.data;
+
+          return Text(
+              'Version ${packageInfo.version}+${packageInfo.buildNumber}');
+        }
+
+        return const Text('');
+      },
+    );
+  }
+
+  /// Build title
+  Text _buildTitle() {
+    return Text(
+      'Bike Angle',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 26,
       ),
     );
   }

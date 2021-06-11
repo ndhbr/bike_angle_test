@@ -13,6 +13,7 @@ class TabNavigationItem {
     @required this.icon,
   });
 
+  /// Main tabbar navigation items
   static List<TabNavigationItem> get items => [
         TabNavigationItem(
           page: RecordingPage(),
