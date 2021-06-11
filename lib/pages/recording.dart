@@ -5,6 +5,7 @@ import 'package:bikeangle/models/device_rotation.dart';
 import 'package:bikeangletest/pages/info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rive/rive.dart';
 
 class RecordingPage extends StatefulWidget {
@@ -124,41 +125,41 @@ class _RecordingPageState extends State<RecordingPage>
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // AnimatedBuilder(
-                            //   animation: _rotationController,
-                            //   builder: (context, child) {
-                            //     return Transform.rotate(
-                            //       angle: -deviceRotation?.bikeAngleRad ?? 0.0,
-                            //       alignment: Alignment.bottomCenter,
-                            //       child: Column(
-                            //         mainAxisSize: MainAxisSize.min,
-                            //         children: [
-                            //           Text(
-                            //             '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
-                            //             style: TextStyle(
-                            //               fontWeight: FontWeight.bold,
-                            //               fontSize: 36,
-                            //             ),
-                            //             textAlign: TextAlign.center,
-                            //           ),
-                            //           SvgPicture.asset(
-                            //             'assets/motorcycle.svg',
-                            //             width: 128,
-                            //           )
-                            //         ],
-                            //       ),
-                            //     );
-                            //   },
-                            // ),
+                            AnimatedBuilder(
+                              animation: _rotationController,
+                              builder: (context, child) {
+                                return Transform.rotate(
+                                  angle: -deviceRotation?.bikeAngleRad ?? 0.0,
+                                  alignment: Alignment.bottomCenter,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 36,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SvgPicture.asset(
+                                        'assets/motorcycle.svg',
+                                        width: 128,
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                             // SizedBox(height: 16.0),
-                            if (_riveArtboard != null) ...{
-                              SizedBox(
-                                height: 128,
-                                child: Rive(
-                                  artboard: _riveArtboard,
-                                ),
-                              ),
-                            },
+                            // if (_riveArtboard != null) ...{
+                            //   SizedBox(
+                            //     height: 128,
+                            //     child: Rive(
+                            //       artboard: _riveArtboard,
+                            //     ),
+                            //   ),
+                            // },
                             SizedBox(height: 16.0),
                             if (deviceRotation.valid) ...{
                               Row(

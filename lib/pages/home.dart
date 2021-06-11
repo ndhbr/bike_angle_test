@@ -26,8 +26,9 @@ class _HomePageState extends State<HomePage> {
         items: [
           for (final tabItem in TabNavigationItem.items)
             BottomNavigationBarItem(
-              icon: tabItem.icon,
               label: tabItem.title,
+              icon: tabItem.icon,
+              activeIcon: tabItem.activeIcon,
             )
         ],
       ),

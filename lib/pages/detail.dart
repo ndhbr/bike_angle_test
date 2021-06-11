@@ -41,6 +41,7 @@ class _DetailPageState extends State<DetailPage> {
 
   /// Edit mode
   bool _editMode;
+  bool _didChange;
   TextEditingController _titleInputController;
 
   @override
@@ -73,17 +74,23 @@ class _DetailPageState extends State<DetailPage> {
           }
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              _buildDateCard(),
-              const SizedBox(height: 8.0),
-              _buildDiagram(),
-              const SizedBox(height: 8.0),
-              _buildStatsCard(),
-            ],
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pop(_didChange);
+          return false;
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                _buildDateCard(),
+                const SizedBox(height: 8.0),
+                _buildDiagram(),
+                const SizedBox(height: 8.0),
+                _buildStatsCard(),
+              ],
+            ),
           ),
         ),
       ),
@@ -93,6 +100,7 @@ class _DetailPageState extends State<DetailPage> {
   /// Initialize detail page
   Future<void> _init() async {
     _editMode = false;
+    _didChange = false;
     _titleInputController = TextEditingController(text: widget.recording.title);
 
     _recording = widget.recording;
@@ -104,7 +112,9 @@ class _DetailPageState extends State<DetailPage> {
 
   /// Toggle name edit mode
   void _toggleEditMode() {
-    setState(() => _editMode = !_editMode);
+    if (mounted) {
+      setState(() => _editMode = !_editMode);
+    }
   }
 
   /// Save new name to the database and toggle edit mode
@@ -115,6 +125,7 @@ class _DetailPageState extends State<DetailPage> {
       if (newTitle != _recording.title) {
         await _bikeAngle.setRecordingTitle(_recording.id, newTitle);
         _recording.title = newTitle;
+        _didChange = true;
       }
     }
 

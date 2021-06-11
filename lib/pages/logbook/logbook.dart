@@ -33,6 +33,10 @@ class _LogbookPageState extends State<LogbookPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_recordings.isEmpty) {
+      _getRecordings();
+    }
+
     return RefreshIndicator(
       onRefresh: () async => await _getRecordings(),
       displacement: 80.0,
@@ -53,6 +57,7 @@ class _LogbookPageState extends State<LogbookPage> {
         (BuildContext context, int index) {
           return LogbookItem(
             _recordings[index],
+            onChanged: _onChanged,
             onDelete: _onDelete,
             key: ValueKey(_recordings[index].id),
           );
@@ -99,7 +104,9 @@ class _LogbookPageState extends State<LogbookPage> {
 
   /// Load recordings from bike angle library
   Future<void> _getRecordings({int startAfter}) async {
-    setState(() => _isLoading = true);
+    if (mounted) {
+      setState(() => _isLoading = true);
+    }
 
     if (_bikeAngle.initialized) {
       List<Recording> recordings =
@@ -118,7 +125,14 @@ class _LogbookPageState extends State<LogbookPage> {
       }
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  /// On changed callback
+  Future<void> _onChanged() async {
+    await _getRecordings();
   }
 
   /// On delete callback
