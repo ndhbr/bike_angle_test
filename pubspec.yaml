@@ -1,5 +1,5 @@
 name: bikeangletest
-description: A new Flutter application to test the bike angle package.
+description: Bike Angle measures the angle of inclination of your motorcycle in curves 
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -32,7 +32,7 @@ dependencies:
   sleek_circular_slider: ^2.0.0
   intl: ^0.17.0
   fl_chart: ^0.35.0
-  rive: ^0.7.10
+  rive: ^0.7.18
   package_info_plus: ^1.0.1
   bikeangle:
     path: ./bike_angle

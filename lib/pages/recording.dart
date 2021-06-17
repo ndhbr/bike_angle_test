@@ -24,6 +24,7 @@ class _RecordingPageState extends State<RecordingPage>
 
   /// Rive
   Artboard _riveArtboard;
+  StateMachineController _stateMachineController;
   SMIInput<double> _riveAngle;
 
   @override
@@ -44,10 +45,12 @@ class _RecordingPageState extends State<RecordingPage>
         // The artboard is the root of the animation and gets drawn in the
         // Rive widget.
         final artboard = file.mainArtboard;
-        var controller = StateMachineController.fromArtboard(artboard, 'State');
-        if (controller != null) {
-          artboard.addController(controller);
-          _riveAngle = controller.findInput('Angle');
+        _stateMachineController =
+            StateMachineController.fromArtboard(artboard, 'State');
+        if (_stateMachineController != null) {
+          artboard.addController(_stateMachineController);
+          _riveAngle = _stateMachineController.findInput('Angle');
+          _riveAngle.value = 90.0;
         }
         setState(() => _riveArtboard = artboard);
       },
@@ -119,47 +122,55 @@ class _RecordingPageState extends State<RecordingPage>
                         // rive angle
                         if (_riveAngle != null) {
                           _riveAngle.value =
-                              deviceRotation.bikeAngle.roundToDouble();
+                              -deviceRotation.bikeAngle.roundToDouble() + 90;
                         }
 
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            AnimatedBuilder(
-                              animation: _rotationController,
-                              builder: (context, child) {
-                                return Transform.rotate(
-                                  angle: -deviceRotation?.bikeAngleRad ?? 0.0,
-                                  alignment: Alignment.bottomCenter,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 36,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      SvgPicture.asset(
-                                        'assets/motorcycle.svg',
-                                        width: 128,
-                                      )
-                                    ],
-                                  ),
-                                );
-                              },
+                            // AnimatedBuilder(
+                            //   animation: _rotationController,
+                            //   builder: (context, child) {
+                            //     return Transform.rotate(
+                            //       angle: -deviceRotation?.bikeAngleRad ?? 0.0,
+                            //       alignment: Alignment.bottomCenter,
+                            //       child: Column(
+                            //         mainAxisSize: MainAxisSize.min,
+                            //         children: [
+                            //           Text(
+                            //             '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                            //             style: TextStyle(
+                            //               fontWeight: FontWeight.bold,
+                            //               fontSize: 36,
+                            //             ),
+                            //             textAlign: TextAlign.center,
+                            //           ),
+                            //           SvgPicture.asset(
+                            //             'assets/motorcycle.svg',
+                            //             width: 128,
+                            //           )
+                            //         ],
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
+                            Text(
+                              '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 36,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            // SizedBox(height: 16.0),
-                            // if (_riveArtboard != null) ...{
-                            //   SizedBox(
-                            //     height: 128,
-                            //     child: Rive(
-                            //       artboard: _riveArtboard,
-                            //     ),
-                            //   ),
-                            // },
+                            if (_riveArtboard != null) ...{
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.4,
+                                child: Rive(
+                                  artboard: _riveArtboard,
+                                ),
+                              ),
+                            },
                             SizedBox(height: 16.0),
                             if (deviceRotation.valid) ...{
                               Row(

@@ -45,7 +45,33 @@ class _LogbookPageState extends State<LogbookPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: <Widget>[
           _buildHeaderBar(),
-          _buildSliverList(),
+          if (_recordings.length == 0) ...{
+            SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 2.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        'Noch keine Aufzeichnungen vorhanden',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                childCount: 1,
+              ),
+            ),
+          } else ...{
+            _buildSliverList(),
+          }
         ],
       ),
     );

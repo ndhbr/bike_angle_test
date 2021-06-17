@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class InfoPage extends StatefulWidget {
@@ -23,6 +24,23 @@ class _InfoPageState extends State<InfoPage> {
               _buildTitle(),
               _buildVersionNumber(),
               const Divider(height: 64.0),
+              Column(
+                children: [
+                  _buildSubtitle('Tipps zur Ausrichtung'),
+                  const SizedBox(height: 16.0),
+                  SvgPicture.asset(
+                    'assets/alignment.svg',
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                  const SizedBox(height: 16.0),
+                  _buildHintListTile(
+                    '45°',
+                    'Ausrichtung',
+                    'Platziere dein Smartphone im Hochformat am Lenker mit ungefähr 45° Drehung zum Boden. Sobald bei der Aufzeichnung "Ausrichtung okay" erscheint, ist das Smartphone bereit zur Messung',
+                  ),
+                ],
+              ),
+              const Divider(height: 64.0),
               _buildCalibrationHints(),
             ],
           ),
@@ -35,33 +53,33 @@ class _InfoPageState extends State<InfoPage> {
   Column _buildCalibrationHints() {
     return Column(
       children: [
-        _buildCalibrationTitle(),
+        _buildSubtitle('Tipps zur Kalibrierung'),
         const SizedBox(height: 16.0),
         if (Platform.isAndroid) ...{
-          _buildHintListTile(1, 'Öffne Google Maps',
+          _buildHintListTile('1.', 'Öffne Google Maps',
               'Warte bis sich die Kartenansicht aufgebaut hat'),
-          _buildHintListTile(2, 'Tippe auf den blauen Punkt',
+          _buildHintListTile('2.', 'Tippe auf den blauen Punkt',
               'Daraufhin öffnet sich ein Fenster mit Optionen'),
-          _buildHintListTile(3, 'Tippe aus „Kompass kalibrieren“',
+          _buildHintListTile('3.', 'Tippe auf „Kompass kalibrieren“',
               'Der Knopf befindet sich unten links'),
           _buildHintListTile(
-              4, 'Tippe auf „Fertig“', 'Wenn die Genauigkeit hoch ist'),
+              '4.', 'Tippe auf „Fertig“', 'Wenn die Genauigkeit hoch ist'),
         } else ...{
-          _buildHintListTile(1, 'Starte das iPhone neu',
+          _buildHintListTile('1.', 'Starte das iPhone neu',
               'Warte bis es komplett hochgefahren ist'),
-          _buildHintListTile(2, 'Öffne den Kompass',
+          _buildHintListTile('2.', 'Öffne den Kompass',
               'Dieser befindet sich standardmäßig im Ordner „Extras“'),
-          _buildHintListTile(3, 'Befolge die Anweisungen',
+          _buildHintListTile('3.', 'Befolge die Anweisungen',
               'Und drehe dein Smartphone, bis der Prozess abgeschlossen ist'),
         },
       ],
     );
   }
 
-  /// Build calibration title
-  Text _buildCalibrationTitle() {
+  /// Build subtitle
+  Text _buildSubtitle(String subtitle) {
     return Text(
-      'Tipps zur Kalibrierung',
+      subtitle,
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 18,
@@ -98,10 +116,10 @@ class _InfoPageState extends State<InfoPage> {
   }
 
   /// Build list tile for calibration hint
-  Widget _buildHintListTile(int index, String title, String subtitle) {
+  Widget _buildHintListTile(String leading, String title, String subtitle) {
     return ListTile(
       leading: Text(
-        '$index.',
+        leading,
         style: TextStyle(
           fontSize: 24.0,
           fontWeight: FontWeight.bold,
