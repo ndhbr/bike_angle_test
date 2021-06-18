@@ -1,5 +1,4 @@
 import 'package:bikeangle/bikeangle.dart';
-import 'package:bikeangle/services/database/controller.dart';
 import 'package:bikeangletest/pages/logbook/logbook_item.dart';
 import 'package:bikeangle/models/recording.dart';
 import 'package:bikeangletest/shared/constants.dart';

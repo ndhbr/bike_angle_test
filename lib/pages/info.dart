@@ -18,7 +18,7 @@ class _InfoPageState extends State<InfoPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
           child: Column(
             children: [
               _buildTitle(),

@@ -323,9 +323,7 @@ class _DetailPageState extends State<DetailPage> {
     return Builder(
       builder: (BuildContext context) {
         if (_deviceRotations.isEmpty) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return const SizedBox();
         }
 
         return _buildLineChart(gradientColorsBlue, _angleData());

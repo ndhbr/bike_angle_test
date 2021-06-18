@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
 import 'package:bikeangletest/pages/info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rive/rive.dart';
 
 class RecordingPage extends StatefulWidget {
@@ -17,10 +14,6 @@ class _RecordingPageState extends State<RecordingPage>
     with TickerProviderStateMixin {
   /// Bike Angle Library
   final BikeAngle _bikeAngle = BikeAngle(debug: true);
-  StreamSubscription _rotationStream;
-
-  /// Rotation controller
-  AnimationController _rotationController;
 
   /// Rive
   Artboard _riveArtboard;
@@ -29,12 +22,6 @@ class _RecordingPageState extends State<RecordingPage>
 
   @override
   void initState() {
-    // Rotation controller
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 100),
-    );
-
     // Load the animation file from the bundle, note that you could also
     // download this. The RiveFile just expects a list of bytes.
     rootBundle.load('assets/bike.riv').then(
@@ -88,6 +75,10 @@ class _RecordingPageState extends State<RecordingPage>
                 FutureBuilder(
                   future: _bikeAngle.getBikeAngle(),
                   builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildLoadingSpinner();
+                    }
+
                     if (snapshot.hasError) {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
@@ -102,10 +93,6 @@ class _RecordingPageState extends State<RecordingPage>
                           ),
                         ],
                       );
-                    }
-
-                    if (!snapshot.hasData) {
-                      return _buildLoadingSpinner();
                     }
 
                     return StreamBuilder<DeviceRotation>(
@@ -128,32 +115,6 @@ class _RecordingPageState extends State<RecordingPage>
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // AnimatedBuilder(
-                            //   animation: _rotationController,
-                            //   builder: (context, child) {
-                            //     return Transform.rotate(
-                            //       angle: -deviceRotation?.bikeAngleRad ?? 0.0,
-                            //       alignment: Alignment.bottomCenter,
-                            //       child: Column(
-                            //         mainAxisSize: MainAxisSize.min,
-                            //         children: [
-                            //           Text(
-                            //             '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
-                            //             style: TextStyle(
-                            //               fontWeight: FontWeight.bold,
-                            //               fontSize: 36,
-                            //             ),
-                            //             textAlign: TextAlign.center,
-                            //           ),
-                            //           SvgPicture.asset(
-                            //             'assets/motorcycle.svg',
-                            //             width: 128,
-                            //           )
-                            //         ],
-                            //       ),
-                            //     );
-                            //   },
-                            // ),
                             Text(
                               '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
                               style: TextStyle(
