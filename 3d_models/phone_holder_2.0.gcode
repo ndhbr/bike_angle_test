@@ -10,8 +10,8 @@
 ;MAXZ:38.7
 ;Generated with Cura_SteamEngine 4.8.0
 T0
-M104 S220
-M109 S220
+M104 S210
+M109 S210
 M82 ;absolute extrusion mode
 G28 ;Home
 G1 Z15.0 F6000 ;Move the platform down 15mm
@@ -66065,13 +66065,13 @@ M83 ;relative extrusion mode
 M104 S0
 ;End of Gcode
 ;SETTING_3 {"global_quality": "[general]\\nversion = 4\\nname = DAYCOM_3DP-100_n
-;SETTING_3 ormalQuality\\ndefinition = makerbotreplicator\\n\\n[metadata]\\ninte
-;SETTING_3 nt_category = default\\ntype = quality_changes\\nsetting_version = 16
-;SETTING_3 \\nquality_type = normal\\n\\n[values]\\nlayer_height = 0.2\\nsupport
+;SETTING_3 ormalQuality\\ndefinition = makerbotreplicator\\n\\n[metadata]\\ntype
+;SETTING_3  = quality_changes\\nquality_type = normal\\nintent_category = defaul
+;SETTING_3 t\\nsetting_version = 16\\n\\n[values]\\nlayer_height = 0.2\\nsupport
 ;SETTING_3 _enable = True\\n\\n", "extruder_quality": ["[general]\\nversion = 4\
 ;SETTING_3 \nname = DAYCOM_3DP-100_normalQuality\\ndefinition = makerbotreplicat
-;SETTING_3 or\\n\\n[metadata]\\nposition = 0\\ntype = quality_changes\\nsetting_
-;SETTING_3 version = 16\\nquality_type = normal\\n\\n[values]\\ncool_fan_full_at
+;SETTING_3 or\\n\\n[metadata]\\ntype = quality_changes\\nquality_type = normal\\
+;SETTING_3 nposition = 0\\nsetting_version = 16\\n\\n[values]\\ncool_fan_full_at
 ;SETTING_3 _height = 5.0\\ninfill_sparse_density = 25\\nmaterial_diameter = 1.75
-;SETTING_3 \\nmaterial_print_temperature = 220\\nspeed_topbottom = 30\\nspeed_tr
+;SETTING_3 \\nmaterial_print_temperature = 210\\nspeed_topbottom = 30\\nspeed_tr
 ;SETTING_3 avel = 100\\nwall_thickness = 0.4\\n\\n"]}
