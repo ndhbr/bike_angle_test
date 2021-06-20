@@ -367,7 +367,7 @@ class _DetailPageState extends State<DetailPage> {
     // Spot
     List<FlSpot> spots = [];
     List<double> smoothedValues = Utils.smoothList(
-      _deviceRotations.map((e) => e.bikeAngle).toList(),
+      _deviceRotations.reversed.map((e) => e.bikeAngle).toList(),
       sectorSize,
     );
     smoothedValues.asMap().forEach((key, value) {
