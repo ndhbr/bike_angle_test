@@ -1,6 +1,7 @@
 import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangle/models/device_rotation.dart';
 import 'package:bikeangletest/pages/info.dart';
+import 'package:bikeangletest/pages/recording/recording_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,7 +75,7 @@ class _RecordingPageState extends State<RecordingPage>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildVisualization(),
-              _buildControls(),
+              RecordingControls(),
             ],
           ),
         ),
@@ -109,60 +110,65 @@ class _RecordingPageState extends State<RecordingPage>
 
         return StreamBuilder<DeviceRotation>(
           stream: snapshot.data,
-          initialData: DeviceRotation(0),
+          initialData: DeviceRotation(0, x: 0, y: 0, z: 0),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildLoadingSpinner();
             }
 
-            DeviceRotation deviceRotation = snapshot.data;
+            if (snapshot.hasData) {
+              DeviceRotation deviceRotation = snapshot.data;
 
-            // rive angle
-            if (_riveAngle != null) {
-              _riveAngle.value = -deviceRotation.bikeAngle.roundToDouble() + 90;
-            }
+              // rive angle
+              if (_riveAngle != null) {
+                _riveAngle.value =
+                    -deviceRotation.bikeAngle.roundToDouble() + 90;
+              }
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 36,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (_riveArtboard != null) ...{
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    child: Rive(
-                      artboard: _riveArtboard,
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${((deviceRotation?.bikeAngle ?? 0.0).abs()).toStringAsFixed(0)} °',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 36,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                },
-                SizedBox(height: 16.0),
-                if (deviceRotation.valid) ...{
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check_outlined),
-                      const SizedBox(width: 8.0),
-                      Text('Ausrichtung korrekt'),
-                    ],
-                  ),
-                } else ...{
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline, color: Colors.red),
-                      const SizedBox(width: 8.0),
-                      Text('Ausrichtung inkorrekt'),
-                    ],
-                  ),
-                }
-              ],
-            );
+                  if (_riveArtboard != null) ...{
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: Rive(
+                        artboard: _riveArtboard,
+                      ),
+                    ),
+                  },
+                  SizedBox(height: 16.0),
+                  if (deviceRotation.valid) ...{
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_outlined),
+                        const SizedBox(width: 8.0),
+                        Text('Ausrichtung korrekt'),
+                      ],
+                    ),
+                  } else ...{
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red),
+                        const SizedBox(width: 8.0),
+                        Text('Ausrichtung inkorrekt'),
+                      ],
+                    ),
+                  }
+                ],
+              );
+            } else {
+              return const SizedBox();
+            }
           },
         );
       },
@@ -176,46 +182,5 @@ class _RecordingPageState extends State<RecordingPage>
       width: 64,
       child: CircularProgressIndicator(),
     );
-  }
-
-  /// Build animated start/stop recording button
-  Widget _buildControls() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      transitionBuilder: (child, animation) => ScaleTransition(
-        child: child,
-        scale: animation,
-      ),
-      child: _getControls(),
-    );
-  }
-
-  /// Get start/stop recording button
-  Widget _getControls() {
-    if (_bikeAngle.isRecording()) {
-      return ElevatedButton.icon(
-        onPressed: () async {
-          await _bikeAngle.stopRecording();
-          setState(() {});
-        },
-        icon: Icon(Icons.stop_outlined),
-        label: Text(
-          'Stoppen'.toUpperCase(),
-        ),
-        key: ValueKey(1),
-      );
-    } else {
-      return ElevatedButton.icon(
-        onPressed: () async {
-          await _bikeAngle.startRecording();
-          setState(() {});
-        },
-        icon: Icon(Icons.play_arrow_outlined),
-        label: Text(
-          'Aufzeichnung starten'.toUpperCase(),
-        ),
-        key: ValueKey(2),
-      );
-    }
   }
 }
