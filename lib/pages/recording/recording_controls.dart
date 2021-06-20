@@ -1,6 +1,7 @@
 import 'package:bikeangle/bikeangle.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:wakelock/wakelock.dart';
 
 class RecordingControls extends StatefulWidget {
   @override
@@ -28,6 +29,7 @@ class _RecordingControlsState extends State<RecordingControls> {
     if (_bikeAngle.isRecording()) {
       return ElevatedButton.icon(
         onPressed: () async {
+          Wakelock.toggle(enable: false);
           await _bikeAngle.stopRecording();
           setState(() {});
         },
@@ -40,6 +42,7 @@ class _RecordingControlsState extends State<RecordingControls> {
     } else {
       return ElevatedButton.icon(
         onPressed: () async {
+          Wakelock.toggle(enable: true);
           await _bikeAngle.startRecording();
           setState(() {});
         },
