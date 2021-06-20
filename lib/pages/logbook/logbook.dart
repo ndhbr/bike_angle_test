@@ -2,6 +2,7 @@ import 'package:bikeangle/bikeangle.dart';
 import 'package:bikeangletest/pages/logbook/logbook_item.dart';
 import 'package:bikeangle/models/recording.dart';
 import 'package:bikeangletest/shared/constants.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -12,7 +13,7 @@ class LogbookPage extends StatefulWidget {
 
 class _LogbookPageState extends State<LogbookPage> {
   /// Bike Angle Library
-  final BikeAngle _bikeAngle = BikeAngle(debug: true);
+  final BikeAngle _bikeAngle = BikeAngle(debug: kDebugMode);
 
   /// Scroll controller
   final ScrollController _scrollController = ScrollController();

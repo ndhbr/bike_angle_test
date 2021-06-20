@@ -24,28 +24,33 @@ class _InfoPageState extends State<InfoPage> {
               _buildTitle(),
               _buildVersionNumber(),
               const Divider(height: 64.0),
-              Column(
-                children: [
-                  _buildSubtitle('Tipps zur Ausrichtung'),
-                  const SizedBox(height: 16.0),
-                  SvgPicture.asset(
-                    'assets/alignment.svg',
-                    width: MediaQuery.of(context).size.width * 0.6,
-                  ),
-                  const SizedBox(height: 16.0),
-                  _buildHintListTile(
-                    '45°',
-                    'Ausrichtung',
-                    'Platziere dein Smartphone im Hochformat am Lenker mit ungefähr 45° Drehung zum Boden. Sobald bei der Aufzeichnung "Ausrichtung okay" erscheint, ist das Smartphone bereit zur Messung',
-                  ),
-                ],
-              ),
+              _buildAlignmentHint(),
               const Divider(height: 64.0),
               _buildCalibrationHints(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// Build alignment hints
+  Column _buildAlignmentHint() {
+    return Column(
+      children: [
+        _buildSubtitle('Tipps zur Ausrichtung'),
+        const SizedBox(height: 16.0),
+        SvgPicture.asset(
+          'assets/alignment.svg',
+          width: MediaQuery.of(context).size.width * 0.6,
+        ),
+        const SizedBox(height: 16.0),
+        _buildHintListTile(
+          '45°',
+          'Ausrichtung',
+          'Platziere dein Smartphone im Hochformat am Lenker mit ungefähr 45° Drehung zum Boden. Sobald bei der Aufzeichnung "Ausrichtung okay" erscheint, ist das Smartphone bereit zur Messung',
+        ),
+      ],
     );
   }
 
